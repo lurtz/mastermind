@@ -1,6 +1,6 @@
 use std::convert::From;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, stdin};
 use std::fmt::{Display, Formatter, Error};
 use std::vec::Vec;
 
@@ -9,10 +9,10 @@ const RED: &str = "\x1B[31m";
 const GREEN: &str = "\x1B[32m";
 const YELLOW: &str = "\x1B[33m";
 const BLUE: &str = "\x1B[34m";
-const MAGENTA: &str = "\x1B[35m";
-const CYAN: &str = "\x1B[36m";
 const WHITE: &str = "\x1B[37m";
 const RESET: &str = "\x1B[0m";
+// moves one line up
+const CURSOR_UP: &str = "\x1B[1A";
 
 const CHAR: &str = "▉";
 
@@ -45,14 +45,15 @@ const NUM_COLORS: u8 = 6;
 
 impl Display for Colors {
     fn fmt(&self, format: &mut Formatter) -> Result<(), Error> {
-        match self {
-            &Colors::Red => write!(format, "{}{}{}", RED, CHAR, RESET),
-            &Colors::Green => write!(format, "{}{}{}", GREEN, CHAR, RESET),
-            &Colors::Blue => write!(format, "{}{}{}", BLUE, CHAR, RESET),
-            &Colors::Yellow => write!(format, "{}{}{}", YELLOW, CHAR, RESET),
-            &Colors::White => write!(format, "{}{}{}", WHITE, CHAR, RESET),
-            &Colors::Black => write!(format, "{}{}{}", BLACK, CHAR, RESET),
-        }
+        let color = match self {
+            &Colors::Red => RED,
+            &Colors::Green => GREEN,
+            &Colors::Blue => BLUE,
+            &Colors::Yellow => YELLOW,
+            &Colors::White => WHITE,
+            &Colors::Black => BLACK,
+        };
+        write!(format, "{}{}{}", color, CHAR, RESET)
     }
 }
 
@@ -66,6 +67,15 @@ impl From<u8> for Colors {
             4 => return Colors::White,
             _ => return Colors::Black,
         }
+    }
+}
+
+impl Colors {
+    fn show_number_mapping() {
+        for i in 0..NUM_COLORS {
+            print!("{}{} ", Colors::from(i), i);
+        }
+        println!();
     }
 }
 
@@ -202,6 +212,8 @@ impl Mastermind {
 
     fn guess(&mut self, values: Values) -> GuessStatus {
         self.guesses.push(self.initial.new_diff_state(values));
+        let mmstate = self.guesses.last().unwrap();
+        println!("{}", mmstate);
         let diff = self.guesses.last().unwrap().get_evaluation();
         if diff.get_correct_match() as usize == NUM_ELEMENTS {
             GuessStatus::Success
@@ -213,19 +225,43 @@ impl Mastermind {
 
 impl Display for Mastermind {
     fn fmt(&self, format: &mut Formatter) -> Result<(), Error> {
-        write!(format, "{}\n", self.initial)?;
-        for g in &self.guesses {
-            write!(format, "{}\n", g)?;
-        }
-        write!(format, "")
+        write!(format, "{}", self.initial)
     }
 }
 
+fn get_guess() -> Result<Values, std::io::Error> {
+    let mut buf = String::new();
+    stdin().read_line(&mut buf)?;
+    let mut result = [Colors::Blue, Colors::Black, Colors::Green, Colors::Yellow];
+    let mut i = 0;
+    for c in buf.as_bytes() {
+        if *c >= ('0' as u8) && *c <= (NUM_COLORS - 1 + '0' as u8) && i < NUM_ELEMENTS{
+            result[i] = Colors::from(*c - ('0' as u8));
+            i += 1;
+        }
+    }
+    Ok(result)
+}
+
 fn main() {
+    Colors::show_number_mapping();
     let mut mm = Mastermind::new();
-    mm.guess([Colors::Blue, Colors::Black, Colors::Green, Colors::Yellow]);
-    let status = mm.guess([Colors::Black, Colors::Black, Colors::Black, Colors::Black]);
-    println!("mm =\n{}\nstatus == {}", mm, status);
+    println!("{}", mm);
+
+    let mut solved = false;
+    while !solved {
+        let guess: Values;
+        match get_guess() {
+            Ok(g) => guess = g,
+            Err(e) => {println!("input error: {}", e); return},
+        };
+        print!("{}", CURSOR_UP);
+        let status = mm.guess(guess);
+        if GuessStatus::Success == status {
+            solved = true;
+            println!("{}", status);
+        }
+    }
 }
 
 #[cfg(test)]
