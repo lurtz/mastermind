@@ -136,6 +136,10 @@ impl MastermindState {
         MastermindState::new(values, eval)
     }
 
+    fn are_values_equal(&self, rhs: &Values) -> bool {
+        return self.values == *rhs
+    }
+
     fn diff(&self, guess: &Values) -> Evaluation {
         let mut correct_matches: u8 = 0;
         let mut color_present: u8 = 0;
@@ -221,6 +225,8 @@ impl Mastermind {
             GuessStatus::Incorrect(diff)
         }
     }
+
+    fn get_initial(&self) -> MastermindState { self.initial }
 }
 
 impl Display for Mastermind {
@@ -241,6 +247,37 @@ fn get_guess() -> Result<Values, std::io::Error> {
         }
     }
     Ok(result)
+}
+
+// solves mastermind in <= 24 turns
+fn solve2(mm: &mut Mastermind) -> Values {
+    let mut guess: Values = [Colors::Red; NUM_ELEMENTS];
+    let mut eval;
+    match mm.guess(guess){
+        GuessStatus::Success => return guess,
+        GuessStatus::Incorrect(e) => eval = e,
+    }
+
+    for i in 0..guess.len() {
+        let mut current_guess = guess;
+        'colors_loop: for j in 1..NUM_COLORS {
+            current_guess[i] = Colors::from(j);
+            match mm.guess(current_guess){
+                GuessStatus::Success => return current_guess,
+                GuessStatus::Incorrect(e) => {
+                    if e.get_correct_match() > eval.get_correct_match() {
+                        eval = e;
+                        guess = current_guess;
+                        break 'colors_loop;
+                    }
+                    if e.get_correct_match() < eval.get_correct_match() {
+                        break 'colors_loop;
+                    }
+                },
+            }
+        }
+    }
+    guess
 }
 
 fn main() {
@@ -269,6 +306,9 @@ mod test {
     use crate::MastermindState;
     use crate::Colors;
     use crate::Evaluation;
+    use crate::NUM_ELEMENTS;
+    use crate::solve2;
+    use crate::Mastermind;
 
     #[test]
     fn random_number_generator_u8_with_valid_limits() {
@@ -393,5 +433,13 @@ mod test {
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
         let diff = mms.diff(&[Colors::Blue, Colors::Blue, Colors::Black, Colors::Black]);
         assert_eq!(Evaluation::new(0, 4), diff);
+    }
+
+    #[test]
+    fn solve2_solves_the_game() {
+        let mut mm = Mastermind::new();
+        let solution = solve2(&mut mm);
+        let pattern =  mm.get_initial();
+        assert!(pattern.are_values_equal(&solution));
     }
 }
