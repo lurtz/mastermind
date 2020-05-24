@@ -139,8 +139,8 @@ impl MastermindState {
     fn diff(&self, guess: &Values) -> Evaluation {
         let mut correct_matches: u8 = 0;
         let mut color_present: u8 = 0;
-        let mut used_slots_truth: [bool; NUM_ELEMENTS]= [false, false, false, false];
-        let mut used_slots_guess: [bool; NUM_ELEMENTS]= [false, false, false, false];
+        let mut used_slots_truth: [bool; NUM_ELEMENTS]= [false; NUM_ELEMENTS];
+        let mut used_slots_guess: [bool; NUM_ELEMENTS]= [false; NUM_ELEMENTS];
 
         // correct matches need to be done first
         for i in 0..guess.len() {
@@ -232,7 +232,7 @@ impl Display for Mastermind {
 fn get_guess() -> Result<Values, std::io::Error> {
     let mut buf = String::new();
     stdin().read_line(&mut buf)?;
-    let mut result = [Colors::Blue, Colors::Black, Colors::Green, Colors::Yellow];
+    let mut result = [Colors::Blue; NUM_ELEMENTS];
     let mut i = 0;
     for c in buf.as_bytes() {
         if *c >= ('0' as u8) && *c <= (NUM_COLORS - 1 + '0' as u8) && i < NUM_ELEMENTS{
@@ -357,7 +357,7 @@ mod test {
 
     #[test]
     fn diff_only_one_color() {
-        let colors = [Colors::Black, Colors::Black, Colors::Black, Colors::Black];
+        let colors = [Colors::Black; NUM_ELEMENTS];
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
         let diff = mms.diff(&[Colors::Yellow, Colors::Yellow, Colors::Black, Colors::Black]);
         assert_eq!(Evaluation::new(2, 0), diff);
