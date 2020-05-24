@@ -246,7 +246,6 @@ fn get_guess() -> Result<Values, std::io::Error> {
 fn main() {
     Colors::show_number_mapping();
     let mut mm = Mastermind::new();
-    println!("{}", mm);
 
     let mut solved = false;
     while !solved {
