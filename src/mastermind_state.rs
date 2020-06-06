@@ -104,7 +104,7 @@ impl Display for MastermindState {
 #[cfg(test)]
 mod test {
     use crate::mastermind_state::{MastermindState, NUM_ELEMENTS};
-    use crate::Colors;
+    use crate::colors::Colors;
     use crate::evaluation::Evaluation;
 
     #[test]
