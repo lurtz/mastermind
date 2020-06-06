@@ -23,7 +23,7 @@ fn get_random_number() -> u64 {
     let mut buf = [0u8; 8];
     f.read_exact(&mut buf).unwrap();
     let mut num: u64 = 0;
-    for i in 0..7 {
+    for i in 0..8 {
         num |= u64::from(buf[i]) << 8*(7 - i);
     }
     num
@@ -135,7 +135,7 @@ impl MastermindState {
         let mut values: Values =
             [Colors::Black, Colors::Black, Colors::Black, Colors::Black];
         for val in values.iter_mut() {
-            *val = Colors::from(get_random_number_u8(Colors::len() + 1));
+            *val = Colors::from(get_random_number_u8(Colors::len()));
         }
         MastermindState::new(values, Evaluation::new(0, 0))
     }
