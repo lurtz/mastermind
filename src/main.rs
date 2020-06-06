@@ -3,6 +3,8 @@ use std::fs::File;
 use std::io::{Read, stdin};
 use std::fmt::{Display, Formatter, Error};
 use std::vec::Vec;
+use std::iter::Iterator;
+use std::slice::Iter;
 
 const BLACK: &str = "\x1B[30m";
 const RED: &str = "\x1B[31m";
@@ -41,42 +43,53 @@ enum Colors {
     Black,
 }
 
-const NUM_COLORS: u8 = 6;
-
 impl Display for Colors {
     fn fmt(&self, format: &mut Formatter) -> Result<(), Error> {
-        let color = match self {
+        write!(format, "{}{}{}", self.to_shell_escape(), CHAR, RESET)
+    }
+}
+
+impl From<u8> for Colors {
+    fn from(num: u8) -> Self {
+        *Colors::iterator().nth(num as usize).unwrap_or(&Colors::Black)
+    }
+}
+
+impl Colors {
+    fn to_shell_escape(&self) -> &str {
+        match self {
             &Colors::Red => RED,
             &Colors::Green => GREEN,
             &Colors::Blue => BLUE,
             &Colors::Yellow => YELLOW,
             &Colors::White => WHITE,
             &Colors::Black => BLACK,
-        };
-        write!(format, "{}{}{}", color, CHAR, RESET)
-    }
-}
-
-impl From<u8> for Colors {
-    fn from(num: u8) -> Self {
-        match num {
-            0 => return Colors::Red,
-            1 => return Colors::Green,
-            2 => return Colors::Blue,
-            3 => return Colors::Yellow,
-            4 => return Colors::White,
-            _ => return Colors::Black,
         }
     }
-}
 
-impl Colors {
     fn show_number_mapping() {
-        for i in 0..NUM_COLORS {
-            print!("{}{} ", Colors::from(i), i);
+        for (pos, col) in Colors::iterator().enumerate() {
+            print!("{}{} ", pos, col);
         }
         println!();
     }
+
+    fn iterator() -> Iter<'static, Colors> {
+        static COLORS: [Colors; 6] = [
+            Colors::Red,
+            Colors::Green,
+            Colors::Blue,
+            Colors::Yellow,
+            Colors::White,
+            Colors::Black];
+        COLORS.iter()
+    }
+
+    fn last() -> Colors {
+        Colors::Black
+    }
+
+    fn len() -> u8 { 6 }
 }
 
 #[derive(Debug,Clone,Copy,PartialEq)]
@@ -122,7 +135,7 @@ impl MastermindState {
         let mut values: Values =
             [Colors::Black, Colors::Black, Colors::Black, Colors::Black];
         for val in values.iter_mut() {
-            *val = Colors::from(get_random_number_u8(NUM_COLORS + 1));
+            *val = Colors::from(get_random_number_u8(Colors::len() + 1));
         }
         MastermindState::new(values, Evaluation::new(0, 0))
     }
@@ -235,18 +248,30 @@ impl Display for Mastermind {
     }
 }
 
+fn get_guess_from_string(buf: String) -> Values {
+    let mut result = [Colors::Blue; NUM_ELEMENTS];
+    let zero_char = '0' as u8;
+
+    let mut result2 = buf.as_bytes().iter()
+        .take(NUM_ELEMENTS)
+        .filter(|c| **c >= zero_char && **c <= (Colors::len() - 1 + zero_char))
+        .map(|c| Colors::from(c - zero_char))
+        .collect::<Vec<Colors>>();
+    while result2.len() < NUM_ELEMENTS {
+        result2.push(Colors::Blue);
+    }
+    result.copy_from_slice(result2.as_slice());
+
+    result
+}
+
 fn get_guess() -> Result<Values, std::io::Error> {
     let mut buf = String::new();
     stdin().read_line(&mut buf)?;
-    let mut result = [Colors::Blue; NUM_ELEMENTS];
-    let mut i = 0;
-    for c in buf.as_bytes() {
-        if *c >= ('0' as u8) && *c <= (NUM_COLORS - 1 + '0' as u8) && i < NUM_ELEMENTS{
-            result[i] = Colors::from(*c - ('0' as u8));
-            i += 1;
+    Ok(get_guess_from_string(buf))
+}
         }
     }
-    Ok(result)
 }
 
 // solves mastermind in <= 24 turns
@@ -260,8 +285,8 @@ fn solve2(mm: &mut Mastermind) -> Values {
 
     for i in 0..guess.len() {
         let mut current_guess = guess;
-        'colors_loop: for j in 1..NUM_COLORS {
-            current_guess[i] = Colors::from(j);
+        'colors_loop: for c in Colors::iterator() {
+            current_guess[i] = *c;
             match mm.guess(current_guess){
                 GuessStatus::Success => return current_guess,
                 GuessStatus::Incorrect(e) => {
