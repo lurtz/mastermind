@@ -6,6 +6,8 @@ use std::vec::Vec;
 use std::iter::Iterator;
 use std::slice::Iter;
 
+// TODO use std::iter::Iterator::enumerate() where appropriate
+
 const BLACK: &str = "\x1B[30m";
 const RED: &str = "\x1B[31m";
 const GREEN: &str = "\x1B[32m";
@@ -270,8 +272,72 @@ fn get_guess() -> Result<Values, std::io::Error> {
     stdin().read_line(&mut buf)?;
     Ok(get_guess_from_string(buf))
 }
+
+fn solve_colors(mm: &mut Mastermind) -> Values {
+    let mut colors: Values = [Colors::Blue; NUM_ELEMENTS];
+    let mut colors_iter = colors.iter_mut();
+
+    for c in Colors::iterator().take_while(|x| **x != Colors::last()) {
+        let guess: Values = [*c; NUM_ELEMENTS];
+        let status = mm.guess(guess);
+        match status {
+            GuessStatus::Success => {
+                return [*c; NUM_ELEMENTS];
+            },
+            GuessStatus::Incorrect(s) => {
+                for _ in 0..(s.correct_match + s.color_present) {
+                    *colors_iter.next().unwrap() = *c;
+                }
+            },
         }
     }
+    for i in colors_iter {
+        *i = Colors::last();
+    }
+    colors
+}
+
+fn are_all_colors_equal(values: Values) -> bool {
+    if values.len() == 0 {
+        return true;
+    }
+    let first = values[0];
+    return values.iter().all(|x| *x == first);
+}
+
+fn switch(values: &mut Values, a: usize, b: usize) {
+    let tmp = values[a];
+    values[a] = values[b];
+    values[b] = tmp;
+}
+
+fn solve(mm: &mut Mastermind) -> Values {
+    let mut result = solve_colors(mm);
+    if are_all_colors_equal(result) {
+        return result;
+    }
+    let mut eval;
+    match mm.guess(result) {
+        GuessStatus::Success => return result,
+        GuessStatus::Incorrect(e) => eval = e,
+    }
+    for i in 0..result.len() {
+        'second_pos: for j in 0..result.len() {
+            let mut current_guess = result;
+            switch(&mut current_guess, i, j);
+            match mm.guess(current_guess) {
+                GuessStatus::Success => return current_guess,
+                GuessStatus::Incorrect(e) => {
+                    if eval.get_correct_match() < e.get_correct_match() {
+                        result = current_guess;
+                        eval = e;
+                        break 'second_pos;
+                    }
+                },
+            }
+        }
+    }
+    result
 }
 
 // solves mastermind in <= 24 turns
@@ -332,6 +398,7 @@ mod test {
     use crate::Colors;
     use crate::Evaluation;
     use crate::NUM_ELEMENTS;
+    use crate::solve;
     use crate::solve2;
     use crate::Mastermind;
 
@@ -458,6 +525,14 @@ mod test {
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
         let diff = mms.diff(&[Colors::Blue, Colors::Blue, Colors::Black, Colors::Black]);
         assert_eq!(Evaluation::new(0, 4), diff);
+    }
+
+    #[test]
+    fn solve_solves_the_game() {
+        let mut mm = Mastermind::new();
+        let solution = solve(&mut mm);
+        let pattern =  mm.get_initial();
+        assert!(pattern.are_values_equal(&solution));
     }
 
     #[test]
