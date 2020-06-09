@@ -1,7 +1,7 @@
-use std::fmt::{Display, Formatter, Error};
-use crate::util::get_random_number_u8;
-use crate::evaluation::Evaluation;
 use crate::colors::Colors;
+use crate::evaluation::Evaluation;
+use crate::util::get_random_number_u8;
+use std::fmt::{Display, Error, Formatter};
 
 pub const NUM_ELEMENTS: usize = 4;
 pub type Values = [Colors; NUM_ELEMENTS];
@@ -10,7 +10,9 @@ pub fn get_guess_from_string(buf: String) -> Values {
     let mut result = [Colors::Blue; NUM_ELEMENTS];
     let zero_char = '0' as u8;
 
-    let mut result2 = buf.as_bytes().iter()
+    let mut result2 = buf
+        .as_bytes()
+        .iter()
         .take(NUM_ELEMENTS)
         .filter(|c| **c >= zero_char && **c <= (Colors::len() - 1 + zero_char))
         .map(|c| Colors::from(c - zero_char))
@@ -23,7 +25,7 @@ pub fn get_guess_from_string(buf: String) -> Values {
     result
 }
 
-#[derive(Debug,Clone,Copy,PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct MastermindState {
     values: Values,
     eval: Evaluation,
@@ -39,7 +41,10 @@ impl MastermindState {
     }
 
     pub fn new(values: Values, eval: Evaluation) -> Self {
-        MastermindState{values: values, eval: eval}
+        MastermindState {
+            values: values,
+            eval: eval,
+        }
     }
 
     pub fn new_diff_state(&self, values: Values) -> MastermindState {
@@ -48,7 +53,7 @@ impl MastermindState {
     }
 
     pub fn are_values_equal(&self, rhs: &Values) -> bool {
-        return self.values == *rhs
+        return self.values == *rhs;
     }
 
     pub fn diff(&self, guess: &Values) -> Evaluation {
@@ -88,7 +93,9 @@ impl MastermindState {
         Evaluation::new(correct_matches, color_present)
     }
 
-    pub fn get_evaluation(&self) -> Evaluation { self.eval }
+    pub fn get_evaluation(&self) -> Evaluation {
+        self.eval
+    }
 }
 
 impl Display for MastermindState {
@@ -102,9 +109,9 @@ impl Display for MastermindState {
 
 #[cfg(test)]
 mod test {
-    use crate::mastermind_state::{MastermindState, NUM_ELEMENTS};
     use crate::colors::Colors;
     use crate::evaluation::Evaluation;
+    use crate::mastermind_state::{MastermindState, NUM_ELEMENTS};
 
     #[test]
     fn create_mastermind_state() {
@@ -141,7 +148,12 @@ mod test {
     fn diff_no_color_correct() {
         let colors = [Colors::Black, Colors::Blue, Colors::Green, Colors::Red];
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
-        let diff = mms.diff(&[Colors::Yellow, Colors::Yellow, Colors::Yellow, Colors::Yellow]);
+        let diff = mms.diff(&[
+            Colors::Yellow,
+            Colors::Yellow,
+            Colors::Yellow,
+            Colors::Yellow,
+        ]);
         assert_eq!(Evaluation::new(0, 0), diff);
     }
 
@@ -149,7 +161,12 @@ mod test {
     fn diff_duplicate_color0() {
         let colors = [Colors::Black, Colors::Black, Colors::Green, Colors::Red];
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
-        let diff = mms.diff(&[Colors::Black, Colors::Yellow, Colors::Yellow, Colors::Yellow]);
+        let diff = mms.diff(&[
+            Colors::Black,
+            Colors::Yellow,
+            Colors::Yellow,
+            Colors::Yellow,
+        ]);
         assert_eq!(Evaluation::new(1, 0), diff);
     }
 
@@ -157,7 +174,12 @@ mod test {
     fn diff_duplicate_color1() {
         let colors = [Colors::Black, Colors::Black, Colors::Green, Colors::Red];
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
-        let diff = mms.diff(&[Colors::Yellow, Colors::Black, Colors::Yellow, Colors::Yellow]);
+        let diff = mms.diff(&[
+            Colors::Yellow,
+            Colors::Black,
+            Colors::Yellow,
+            Colors::Yellow,
+        ]);
         assert_eq!(Evaluation::new(1, 0), diff);
     }
 
@@ -197,7 +219,12 @@ mod test {
     fn diff_only_one_color_except_one_with_color_fit() {
         let colors = [Colors::Black, Colors::Black, Colors::Black, Colors::Blue];
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
-        let diff = mms.diff(&[Colors::Yellow, Colors::Yellow, Colors::Yellow, Colors::Black]);
+        let diff = mms.diff(&[
+            Colors::Yellow,
+            Colors::Yellow,
+            Colors::Yellow,
+            Colors::Black,
+        ]);
         assert_eq!(Evaluation::new(0, 1), diff);
     }
 

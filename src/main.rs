@@ -1,16 +1,16 @@
-mod util;
 mod colors;
 mod evaluation;
-mod mastermind_state;
-mod mastermind;
-mod single_digit_solver;
-mod multi_digit_solver;
-mod solver;
 mod manual_solver;
+mod mastermind;
+mod mastermind_state;
+mod multi_digit_solver;
+mod single_digit_solver;
+mod solver;
+mod util;
 
 use mastermind::Mastermind;
-use std::env;
 use solver::parse_args;
+use std::env;
 
 fn main() {
     let mut mm = Mastermind::new();

@@ -1,6 +1,6 @@
 use crate::colors::Colors;
+use crate::mastermind::{GuessStatus, Mastermind};
 use crate::mastermind_state::{Values, NUM_ELEMENTS};
-use crate::mastermind::{Mastermind, GuessStatus};
 
 fn solve_colors(mm: &mut Mastermind) -> Values {
     let mut colors: Values = [Colors::Blue; NUM_ELEMENTS];
@@ -12,12 +12,12 @@ fn solve_colors(mm: &mut Mastermind) -> Values {
         match status {
             GuessStatus::Success => {
                 return [*c; NUM_ELEMENTS];
-            },
+            }
             GuessStatus::Incorrect(s) => {
                 for _ in 0..(s.get_correct_match() + s.get_color_present()) {
                     *colors_iter.next().unwrap() = *c;
                 }
-            },
+            }
         }
     }
     for i in colors_iter {
@@ -62,7 +62,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
                         eval = e;
                         break 'second_pos;
                     }
-                },
+                }
             }
         }
     }
@@ -71,9 +71,9 @@ pub fn solve(mm: &mut Mastermind) -> Values {
 
 #[cfg(test)]
 mod test {
-    use crate::Mastermind;
     use crate::multi_digit_solver::solve;
     use crate::solver::SolverFn;
+    use crate::Mastermind;
 
     #[test]
     fn solve_has_correct_type() {
@@ -84,7 +84,7 @@ mod test {
     fn solve_solves_the_game() {
         let mut mm = Mastermind::new();
         let solution = solve(&mut mm);
-        let pattern =  mm.get_initial();
+        let pattern = mm.get_initial();
         assert!(pattern.are_values_equal(&solution));
     }
 }

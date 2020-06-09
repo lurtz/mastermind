@@ -1,9 +1,9 @@
-use std::fmt::{Display, Formatter, Error};
-use std::vec::Vec;
 use crate::evaluation::Evaluation;
 use crate::mastermind_state::{MastermindState, Values, NUM_ELEMENTS};
+use std::fmt::{Display, Error, Formatter};
+use std::vec::Vec;
 
-#[derive(Debug,Clone,Copy,PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GuessStatus {
     Success,
     Incorrect(Evaluation),
@@ -15,7 +15,7 @@ impl Display for GuessStatus {
     }
 }
 
-#[derive(Debug,Clone,PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Mastermind {
     initial: MastermindState,
     guesses: Vec<MastermindState>,
@@ -23,9 +23,10 @@ pub struct Mastermind {
 
 impl Mastermind {
     pub fn new() -> Self {
-        Mastermind{
+        Mastermind {
             initial: MastermindState::new_random_state(),
-            guesses: Vec::<MastermindState>::new()}
+            guesses: Vec::<MastermindState>::new(),
+        }
     }
 
     pub fn guess(&mut self, values: Values) -> GuessStatus {
@@ -40,9 +41,13 @@ impl Mastermind {
         }
     }
 
-    pub fn get_initial(&self) -> MastermindState { self.initial }
+    pub fn get_initial(&self) -> MastermindState {
+        self.initial
+    }
 
-    pub fn get_guesses(&self) -> Vec<MastermindState> { self.guesses.clone() }
+    pub fn get_guesses(&self) -> Vec<MastermindState> {
+        self.guesses.clone()
+    }
 }
 
 impl Display for Mastermind {
@@ -50,5 +55,3 @@ impl Display for Mastermind {
         write!(format, "{}", self.initial)
     }
 }
-
-

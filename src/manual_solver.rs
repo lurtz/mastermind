@@ -1,8 +1,8 @@
-use std::io::stdin;
-use crate::util::CURSOR_UP;
-use crate::mastermind_state::{Values, get_guess_from_string};
-use crate::mastermind::{Mastermind, GuessStatus};
 use crate::colors::Colors;
+use crate::mastermind::{GuessStatus, Mastermind};
+use crate::mastermind_state::{get_guess_from_string, Values};
+use crate::util::CURSOR_UP;
+use std::io::stdin;
 
 fn get_guess() -> Result<Values, std::io::Error> {
     let mut buf = String::new();

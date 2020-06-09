@@ -1,9 +1,9 @@
-use std::fmt::{Display, Formatter, Error};
+use std::fmt::{Display, Error, Formatter};
 use std::slice::Iter;
 
-use crate::util::{CHAR, RESET, BLUE, BLACK, GREEN, WHITE, YELLOW, RED};
+use crate::util::{BLACK, BLUE, CHAR, GREEN, RED, RESET, WHITE, YELLOW};
 
-#[derive(Debug,Clone,Copy,PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Colors {
     Red,
     Green,
@@ -19,7 +19,8 @@ const COLORS: [Colors; 6] = [
     Colors::Blue,
     Colors::Yellow,
     Colors::White,
-    Colors::Black];
+    Colors::Black,
+];
 
 impl Display for Colors {
     fn fmt(&self, format: &mut Formatter) -> Result<(), Error> {
@@ -29,7 +30,9 @@ impl Display for Colors {
 
 impl From<u8> for Colors {
     fn from(num: u8) -> Self {
-        *Colors::iterator().nth(num as usize).unwrap_or(&Colors::Black)
+        *Colors::iterator()
+            .nth(num as usize)
+            .unwrap_or(&Colors::Black)
     }
 }
 
@@ -60,5 +63,7 @@ impl Colors {
         *COLORS.last().unwrap()
     }
 
-    pub fn len() -> u8 { COLORS.len() as u8 }
+    pub fn len() -> u8 {
+        COLORS.len() as u8
+    }
 }
