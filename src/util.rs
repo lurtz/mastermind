@@ -11,6 +11,7 @@ pub const RESET: &str = "\x1B[0m";
 // moves one line up
 pub const CURSOR_UP: &str = "\x1B[1A";
 
+pub const DOTS: &str = "▉▉▉▉";
 pub const CHAR: &str = "▉";
 
 fn get_random_number() -> u64 {

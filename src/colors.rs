@@ -13,6 +13,14 @@ pub enum Colors {
     Black,
 }
 
+const COLORS: [Colors; 6] = [
+    Colors::Red,
+    Colors::Green,
+    Colors::Blue,
+    Colors::Yellow,
+    Colors::White,
+    Colors::Black];
+
 impl Display for Colors {
     fn fmt(&self, format: &mut Formatter) -> Result<(), Error> {
         write!(format, "{}{}{}", self.to_shell_escape(), CHAR, RESET)
@@ -45,19 +53,12 @@ impl Colors {
     }
 
     pub fn iterator() -> Iter<'static, Colors> {
-        static COLORS: [Colors; 6] = [
-            Colors::Red,
-            Colors::Green,
-            Colors::Blue,
-            Colors::Yellow,
-            Colors::White,
-            Colors::Black];
         COLORS.iter()
     }
 
     pub fn last() -> Colors {
-        Colors::Black
+        *COLORS.last().unwrap()
     }
 
-    pub fn len() -> u8 { 6 }
+    pub fn len() -> u8 { COLORS.len() as u8 }
 }
