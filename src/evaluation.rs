@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, Error};
-use crate::util::{CHAR, RESET, BLACK, WHITE};
+use crate::util::{RESET, BLACK, WHITE, DOTS};
 
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub struct Evaluation {
@@ -18,14 +18,9 @@ impl Evaluation {
 
 impl Display for Evaluation {
     fn fmt(&self, format: &mut Formatter) -> Result<(), Error> {
-        let mut correct_dots = String::new();
-        for _ in 0..self.get_correct_match() {
-            correct_dots.push_str(CHAR);
-        }
-        let mut present_dots = String::new();
-        for _ in 0..self.get_color_present() {
-            present_dots.push_str(CHAR);
-        }
+        // each square seems to consume 3 bytes
+        let correct_dots = &DOTS[0..3*(self.get_correct_match() as usize)];
+        let present_dots = &DOTS[0..3*(self.get_color_present() as usize)];
         write!(format, "{}{}{}{}{}", BLACK, correct_dots, WHITE, present_dots, RESET)
     }
 }
