@@ -31,8 +31,7 @@ pub struct MastermindState {
 
 impl MastermindState {
     pub fn new_random_state() -> Self {
-        let mut values: Values =
-            [Colors::Black, Colors::Black, Colors::Black, Colors::Black];
+        let mut values: Values = [Colors::Black; NUM_ELEMENTS];
         for val in values.iter_mut() {
             *val = Colors::from(get_random_number_u8(Colors::len()));
         }
@@ -55,8 +54,8 @@ impl MastermindState {
     pub fn diff(&self, guess: &Values) -> Evaluation {
         let mut correct_matches: u8 = 0;
         let mut color_present: u8 = 0;
-        let mut used_slots_truth: [bool; NUM_ELEMENTS]= [false; NUM_ELEMENTS];
-        let mut used_slots_guess: [bool; NUM_ELEMENTS]= [false; NUM_ELEMENTS];
+        let mut used_slots_truth = [false; NUM_ELEMENTS];
+        let mut used_slots_guess = [false; NUM_ELEMENTS];
 
         // correct matches need to be done first
         for i in 0..guess.len() {
