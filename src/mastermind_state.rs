@@ -8,7 +8,7 @@ pub type Values = [Colors; NUM_ELEMENTS];
 
 pub fn get_guess_from_string(buf: String) -> Values {
     let mut result = [Colors::Blue; NUM_ELEMENTS];
-    let zero_char = '0' as u8;
+    let zero_char = b'0';
 
     let mut result2 = buf
         .as_bytes()
@@ -41,10 +41,7 @@ impl MastermindState {
     }
 
     pub fn new(values: Values, eval: Evaluation) -> Self {
-        MastermindState {
-            values: values,
-            eval: eval,
-        }
+        MastermindState { values, eval }
     }
 
     pub fn new_diff_state(&self, values: Values) -> MastermindState {
@@ -53,7 +50,7 @@ impl MastermindState {
     }
 
     pub fn are_values_equal(&self, rhs: &Values) -> bool {
-        return self.values == *rhs;
+        self.values == *rhs
     }
 
     pub fn diff(&self, guess: &Values) -> Evaluation {
@@ -79,8 +76,8 @@ impl MastermindState {
             }
 
             let c = &guess[i];
-            for j in 0..self.values.len() {
-                if *c == self.values[j] && !used_slots_truth[j] {
+            for (j, val) in self.values.iter().enumerate() {
+                if *c == *val && !used_slots_truth[j] {
                     color_present += 1;
                     used_slots_truth[j] = true;
                     used_slots_guess[i] = true;

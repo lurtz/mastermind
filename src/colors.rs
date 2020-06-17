@@ -38,13 +38,13 @@ impl From<u8> for Colors {
 
 impl Colors {
     fn to_shell_escape(&self) -> &str {
-        match self {
-            &Colors::Red => RED,
-            &Colors::Green => GREEN,
-            &Colors::Blue => BLUE,
-            &Colors::Yellow => YELLOW,
-            &Colors::White => WHITE,
-            &Colors::Black => BLACK,
+        match *self {
+            Colors::Red => RED,
+            Colors::Green => GREEN,
+            Colors::Blue => BLUE,
+            Colors::Yellow => YELLOW,
+            Colors::White => WHITE,
+            Colors::Black => BLACK,
         }
     }
 

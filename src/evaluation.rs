@@ -8,10 +8,10 @@ pub struct Evaluation {
 }
 
 impl Evaluation {
-    pub fn new(correct_matches: u8, color_present: u8) -> Self {
+    pub fn new(correct_match: u8, color_present: u8) -> Self {
         Evaluation {
-            correct_match: correct_matches,
-            color_present: color_present,
+            correct_match,
+            color_present,
         }
     }
 

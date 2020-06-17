@@ -27,17 +27,11 @@ fn solve_colors(mm: &mut Mastermind) -> Values {
 }
 
 fn are_all_colors_equal(values: Values) -> bool {
-    if values.len() == 0 {
+    if values.is_empty() {
         return true;
     }
     let first = values[0];
-    return values.iter().all(|x| *x == first);
-}
-
-fn switch(values: &mut Values, a: usize, b: usize) {
-    let tmp = values[a];
-    values[a] = values[b];
-    values[b] = tmp;
+    values.iter().all(|x| *x == first)
 }
 
 pub fn solve(mm: &mut Mastermind) -> Values {
@@ -53,7 +47,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
     for i in 0..result.len() {
         'second_pos: for j in 0..result.len() {
             let mut current_guess = result;
-            switch(&mut current_guess, i, j);
+            current_guess.swap(i, j);
             match mm.guess(current_guess) {
                 GuessStatus::Success => return current_guess,
                 GuessStatus::Incorrect(e) => {

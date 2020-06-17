@@ -19,8 +19,8 @@ fn get_random_number() -> u64 {
     let mut buf = [0u8; 8];
     f.read_exact(&mut buf).unwrap();
     let mut num: u64 = 0;
-    for i in 0..8 {
-        num |= u64::from(buf[i]) << 8 * (7 - i);
+    for (i, val) in buf.iter().enumerate() {
+        num |= u64::from(*val) << (8 * (7 - i));
     }
     num
 }
