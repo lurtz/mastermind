@@ -6,7 +6,7 @@ fn solve_colors(mm: &mut Mastermind) -> Values {
     let mut colors: Values = [Colors::Blue; NUM_ELEMENTS];
     let mut colors_iter = colors.iter_mut();
 
-    for c in Colors::iterator().take_while(|x| **x != Colors::last()) {
+    for c in Colors::iter().take_while(|x| **x != Colors::last()) {
         let guess: Values = [*c; NUM_ELEMENTS];
         let status = mm.guess(guess);
         match status {

@@ -1,7 +1,6 @@
+use crate::manual_solver;
 use crate::mastermind::Mastermind;
 use crate::mastermind_state::Values;
-
-use crate::manual_solver;
 use crate::multi_digit_solver;
 use crate::single_digit_solver;
 
@@ -19,4 +18,63 @@ pub fn parse_args(args: Vec<String>) -> SolverFn {
         solver = manual_solver::solve;
     }
     solver
+}
+
+#[cfg(test)]
+mod test {
+    use crate::colors::Colors;
+    use crate::mastermind::Mastermind;
+    use crate::mastermind_state::MastermindState;
+    use crate::multi_digit_solver;
+    use crate::single_digit_solver;
+    use crate::solver::parse_args;
+    use std::string::String;
+
+    #[test]
+    fn empty_args_results_in_manual_solver() {
+        parse_args(vec![]);
+    }
+
+    #[test]
+    fn no_args_results_in_manual_solver() {
+        parse_args(vec![String::from("bla")]);
+    }
+
+    #[test]
+    fn single_results_in_single_digit_solver() {
+        parse_args(vec![String::from("bla"), String::from("single")]);
+    }
+
+    #[test]
+    fn multi_results_in_multi_digit_solver() {
+        parse_args(vec![String::from("bla"), String::from("multi")]);
+    }
+
+    #[test]
+    fn unknown_string_results_in_manual_solver() {
+        parse_args(vec![String::from("bla"), String::from("fdjafda")]);
+    }
+
+    macro_rules! solver_tests {($solvers:expr; $($name:ident: $value:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let values = $value;
+                for solver in $solvers.iter() {
+                    let mut mm = Mastermind::new_with_state(values);
+                    let solution =solver(&mut mm);
+                    let pattern = mm.get_initial();
+                    assert!(pattern.are_values_equal(&solution));
+                    assert!(MastermindState::new_initial(values).are_values_equal(&solution));
+                }
+            }
+        )*
+    }}
+
+    solver_tests! {
+        [multi_digit_solver::solve, single_digit_solver::solve];
+        solve_with_red_state_solves_the_game_fast: [Colors::Red; 4],
+        solve_with_black_state_solves_the_game_slow: [Colors::Black; 4],
+        solve_with_mixed_state_solves_the_game: [Colors::Blue, Colors::White, Colors::Green, Colors::Yellow],
+    }
 }

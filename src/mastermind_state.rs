@@ -44,6 +44,13 @@ impl MastermindState {
         MastermindState { values, eval }
     }
 
+    pub fn new_initial(values: Values) -> Self {
+        MastermindState {
+            values: values,
+            eval: Evaluation::new(0, 0),
+        }
+    }
+
     pub fn new_diff_state(&self, values: Values) -> MastermindState {
         let eval = MastermindState::diff(self, &values);
         MastermindState::new(values, eval)
@@ -93,6 +100,10 @@ impl MastermindState {
     pub fn get_evaluation(&self) -> Evaluation {
         self.eval
     }
+
+    pub fn get_values(&self) -> Values {
+        self.values
+    }
 }
 
 impl Display for MastermindState {
@@ -108,7 +119,7 @@ impl Display for MastermindState {
 mod test {
     use crate::colors::Colors;
     use crate::evaluation::Evaluation;
-    use crate::mastermind_state::{MastermindState, NUM_ELEMENTS};
+    use crate::mastermind_state::{get_guess_from_string, MastermindState, NUM_ELEMENTS};
 
     #[test]
     fn create_mastermind_state() {
@@ -239,5 +250,62 @@ mod test {
         let mms = MastermindState::new(colors, Evaluation::new(0, 0));
         let diff = mms.diff(&[Colors::Blue, Colors::Blue, Colors::Black, Colors::Black]);
         assert_eq!(Evaluation::new(0, 4), diff);
+    }
+
+    #[test]
+    fn get_guess_from_empty_string_returns_blue_colors() {
+        let values = get_guess_from_string(String::from(""));
+        assert_eq!(values, [Colors::Blue; 4]);
+    }
+
+    #[test]
+    fn get_guess_from_string_returns_result() {
+        let values = get_guess_from_string(String::from("3214"));
+        assert_eq!(
+            values,
+            [Colors::Yellow, Colors::Blue, Colors::Green, Colors::White]
+        );
+    }
+
+    #[test]
+    fn get_guess_from_too_big_string_considers_first_characters() {
+        let values = get_guess_from_string(String::from("0123456"));
+        assert_eq!(
+            values,
+            [Colors::Red, Colors::Green, Colors::Blue, Colors::Yellow]
+        );
+    }
+
+    #[test]
+    fn get_guess_from_invalid_numbers_returns_blue_colors() {
+        let values = get_guess_from_string(String::from("888888"));
+        assert_eq!(values, [Colors::Blue; 4]);
+    }
+
+    #[test]
+    fn get_guess_from_invalid_number_is_ignored_and_padded_with_blue_colors() {
+        let values = get_guess_from_string(String::from("3393"));
+        assert_eq!(
+            values,
+            [Colors::Yellow, Colors::Yellow, Colors::Yellow, Colors::Blue]
+        );
+    }
+
+    #[test]
+    fn get_guess_from_invalid_character_is_ignored_and_padded_with_blue_colors() {
+        let values = get_guess_from_string(String::from("3l33"));
+        assert_eq!(
+            values,
+            [Colors::Yellow, Colors::Yellow, Colors::Yellow, Colors::Blue]
+        );
+    }
+
+    #[test]
+    fn get_guess_ignores_invalid_character_and_number_of_too_big_string_and_pads_with_blue() {
+        let values = get_guess_from_string(String::from("3l95180r4"));
+        assert_eq!(
+            values,
+            [Colors::Yellow, Colors::Black, Colors::Blue, Colors::Blue]
+        );
     }
 }

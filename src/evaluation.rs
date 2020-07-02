@@ -35,3 +35,31 @@ impl Display for Evaluation {
         )
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::evaluation::Evaluation;
+
+    #[test]
+    fn new() {
+        let x = 4;
+        let y = 5;
+        let eval = Evaluation::new(x, y);
+        assert_eq!(x, eval.get_correct_match());
+        assert_eq!(y, eval.get_color_present());
+    }
+
+    #[test]
+    fn display() {
+        assert_eq!(
+            "\u{1b}[30m▉▉▉\u{1b}[37m▉▉▉▉\u{1b}[0m",
+            format!("{}", Evaluation::new(3, 4))
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn display_out_of_bounds() {
+        format!("{}", Evaluation::new(5, 4));
+    }
+}

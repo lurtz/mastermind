@@ -11,19 +11,19 @@ pub fn solve(mm: &mut Mastermind) -> Values {
         GuessStatus::Incorrect(e) => eval = e,
     }
 
-    for i in 0..guess.len() {
+    'guess_loop: for i in 0..guess.len() {
         let mut current_guess = guess;
-        'colors_loop: for c in Colors::iterator() {
+        'colors_loop: for c in Colors::iter() {
             current_guess[i] = *c;
             match mm.guess(current_guess) {
-                GuessStatus::Success => return current_guess,
+                GuessStatus::Success => {
+                    guess = current_guess;
+                    break 'guess_loop;
+                }
                 GuessStatus::Incorrect(e) => {
                     if e.get_correct_match() > eval.get_correct_match() {
                         eval = e;
                         guess = current_guess;
-                        break 'colors_loop;
-                    }
-                    if e.get_correct_match() < eval.get_correct_match() {
                         break 'colors_loop;
                     }
                 }
@@ -45,7 +45,7 @@ mod test {
     }
 
     #[test]
-    fn solve2_solves_the_game() {
+    fn solve_solves_the_game() {
         let mut mm = Mastermind::new();
         let solution = solve(&mut mm);
         let pattern = mm.get_initial();
