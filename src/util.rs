@@ -46,4 +46,17 @@ mod test {
     fn random_number_generator_u8_with_invalid_limit() {
         get_random_number_u8(0);
     }
+
+    #[test]
+    fn random_number_generator_generates_complete_range() {
+        for upper_limit in 1..20 {
+            let mut generated = Vec::<bool>::with_capacity(upper_limit);
+            generated.resize(upper_limit, false);
+            while generated.iter().any(|x| *x == false) {
+                let x = get_random_number_u8(upper_limit as u8);
+                assert!(x < upper_limit as u8);
+                generated[x as usize] = true;
+            }
+        }
+    }
 }
