@@ -46,7 +46,7 @@ impl MastermindState {
 
     pub fn new_initial(values: Values) -> Self {
         MastermindState {
-            values: values,
+            values,
             eval: Evaluation::new(0, 0),
         }
     }
