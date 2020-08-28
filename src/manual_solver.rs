@@ -40,6 +40,7 @@ mod test {
     use crate::mastermind::Mastermind;
     use crate::mastermind_state::{get_guess_from_string, MastermindState, Values};
     use crate::solver::SolverFn;
+    use std::io::{Error, ErrorKind};
 
     #[test]
     fn solve_has_correct_type() {
@@ -48,7 +49,7 @@ mod test {
 
     #[test]
     fn solve_with_correct_guess() {
-        let return_black = || -> Result<Values, std::io::Error> {
+        let return_black = || -> Result<Values, Error> {
             Ok(get_guess_from_string(String::from("5555")))
         };
         let values = [Colors::Black; 4];
@@ -58,4 +59,38 @@ mod test {
         assert!(pattern.are_values_equal(&solution));
         assert!(MastermindState::new_initial(values).are_values_equal(&solution));
     }
+
+    fn get_blue_and_black_guess() -> Result<Values, Error> {
+        static mut NUM_QUERIES: u8 = 0;
+        unsafe {
+            NUM_QUERIES += 1;
+            if 1 == NUM_QUERIES {
+                Ok(get_guess_from_string(String::from("4444")))
+            } else {
+                Ok(get_guess_from_string(String::from("5555")))
+            }
+        }
+    }
+
+    #[test]
+    fn solve_with_incorrect_and_correct_guess() {
+        let values = [Colors::Black; 4];
+        let mut mm = Mastermind::new_with_state(values);
+        let solution = solve_with_input(&mut mm, get_blue_and_black_guess);
+        let pattern = mm.get_initial();
+        assert!(pattern.are_values_equal(&solution));
+        assert!(MastermindState::new_initial(values).are_values_equal(&solution));
+    }
+
+    #[test]
+    #[should_panic]
+    fn solve_with_erroring_input_panics() {
+        let return_black = || -> Result<Values, Error> {
+            Err(Error::from(ErrorKind::InvalidData))
+        };
+        let values = [Colors::Black; 4];
+        let mut mm = Mastermind::new_with_state(values);
+        let _ = solve_with_input(&mut mm, return_black);
+    }
+
 }
