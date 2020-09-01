@@ -35,7 +35,7 @@ mod test {
     }
 
     fn parse_args_tests(args: Vec<String>, func: SolverFn) {
-        assert!(parse_args(args) as *const () == func as *const ());
+        assert!(parse_args(args) as *const SolverFn == func as *const SolverFn);
     }
 
     #[test]
