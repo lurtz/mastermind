@@ -38,6 +38,7 @@ mod test {
     use crate::single_digit_solver::solve;
     use crate::solver::SolverFn;
     use crate::Mastermind;
+    use crate::solver::test_utils::check_solution;
 
     #[test]
     fn solve_has_correct_type() {
@@ -48,7 +49,6 @@ mod test {
     fn solve_solves_the_game() {
         let mut mm = Mastermind::new();
         let solution = solve(&mut mm);
-        let pattern = mm.get_initial();
-        assert!(pattern.are_values_equal(&solution));
+        check_solution(&mm.get_initial().get_values(), &mm, &solution);
     }
 }

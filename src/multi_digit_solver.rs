@@ -27,9 +27,7 @@ fn solve_colors(mm: &mut Mastermind) -> Values {
 }
 
 fn are_all_colors_equal(values: Values) -> bool {
-    if values.is_empty() {
-        return true;
-    }
+    assert!(!values.is_empty());
     let first = values[0];
     values.iter().all(|x| *x == first)
 }
@@ -68,6 +66,7 @@ mod test {
     use crate::multi_digit_solver::solve;
     use crate::solver::SolverFn;
     use crate::Mastermind;
+    use crate::solver::test_utils::check_solution;
 
     #[test]
     fn solve_has_correct_type() {
@@ -78,7 +77,6 @@ mod test {
     fn solve_solves_the_game() {
         let mut mm = Mastermind::new();
         let solution = solve(&mut mm);
-        let pattern = mm.get_initial();
-        assert!(pattern.are_values_equal(&solution));
+        check_solution(&mm.get_initial().get_values(), &mm, &solution);
     }
 }

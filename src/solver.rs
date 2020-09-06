@@ -20,14 +20,27 @@ pub fn parse_args(args: Vec<String>) -> SolverFn {
     solver
 }
 
+
+#[cfg(test)]
+pub mod test_utils {
+    use crate::mastermind::Mastermind;
+    use crate::mastermind_state::{MastermindState, Values};
+
+    pub fn check_solution(values: &Values, mm: &Mastermind, solution: &Values) {
+        let pattern = mm.get_initial();
+        assert!(pattern.are_values_equal(&solution));
+        assert!(MastermindState::new_initial(*values).are_values_equal(&solution));
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::colors::Colors;
     use crate::mastermind::Mastermind;
-    use crate::mastermind_state::MastermindState;
     use crate::{multi_digit_solver, single_digit_solver, manual_solver};
     use crate::solver::{parse_args, SolverFn};
     use std::string::String;
+    use crate::solver::test_utils::check_solution;
 
     #[test]
     fn empty_args_results_in_manual_solver() {
@@ -68,10 +81,8 @@ mod test {
                 let values = $value;
                 for solver in $solvers.iter() {
                     let mut mm = Mastermind::new_with_state(values);
-                    let solution =solver(&mut mm);
-                    let pattern = mm.get_initial();
-                    assert!(pattern.are_values_equal(&solution));
-                    assert!(MastermindState::new_initial(values).are_values_equal(&solution));
+                    let solution = solver(&mut mm);
+                    check_solution(&values, &mm, &solution);
                 }
             }
         )*

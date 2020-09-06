@@ -38,8 +38,9 @@ mod test {
     use crate::manual_solver::solve;
     use crate::manual_solver::solve_with_input;
     use crate::mastermind::Mastermind;
-    use crate::mastermind_state::{get_guess_from_string, MastermindState, Values};
+    use crate::mastermind_state::{get_guess_from_string, Values};
     use crate::solver::SolverFn;
+    use crate::solver::test_utils::check_solution;
     use std::io::{Error, ErrorKind};
 
     #[test]
@@ -55,9 +56,7 @@ mod test {
         let values = [Colors::Black; 4];
         let mut mm = Mastermind::new_with_state(values);
         let solution = solve_with_input(&mut mm, return_black);
-        let pattern = mm.get_initial();
-        assert!(pattern.are_values_equal(&solution));
-        assert!(MastermindState::new_initial(values).are_values_equal(&solution));
+        check_solution(&values, &mm, &solution);
     }
 
     fn get_blue_and_black_guess() -> Result<Values, Error> {
@@ -77,9 +76,7 @@ mod test {
         let values = [Colors::Black; 4];
         let mut mm = Mastermind::new_with_state(values);
         let solution = solve_with_input(&mut mm, get_blue_and_black_guess);
-        let pattern = mm.get_initial();
-        assert!(pattern.are_values_equal(&solution));
-        assert!(MastermindState::new_initial(values).are_values_equal(&solution));
+        check_solution(&values, &mm, &solution);
     }
 
     #[test]
