@@ -13,7 +13,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
 
     'guess_loop: for i in 0..guess.len() {
         let mut current_guess = guess;
-        'colors_loop: for c in Colors::iter() {
+        'colors_loop: for c in Colors::iter().skip(1) {
             current_guess[i] = *c;
             match mm.guess(current_guess) {
                 GuessStatus::Success => {
