@@ -3,7 +3,7 @@ use std::slice::Iter;
 
 use crate::util::{BLACK, BLUE, CHAR, GREEN, RED, RESET, WHITE, YELLOW};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Hash, Eq)]
 pub enum Colors {
     Red,
     Green,

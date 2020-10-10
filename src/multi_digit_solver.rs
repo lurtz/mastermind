@@ -1,6 +1,7 @@
 use crate::colors::Colors;
 use crate::mastermind::{GuessStatus, Mastermind};
 use crate::mastermind_state::{Values, NUM_ELEMENTS};
+use std::collections::HashSet;
 
 fn solve_colors(mm: &mut Mastermind) -> Values {
     let mut colors: Values = [Colors::Blue; NUM_ELEMENTS];
@@ -42,6 +43,8 @@ pub fn solve(mm: &mut Mastermind) -> Values {
         GuessStatus::Success => return result,
         GuessStatus::Incorrect(e) => eval = e,
     }
+    let mut tried_patterns = HashSet::new();
+    tried_patterns.insert(result);
     for i in 0..result.len() {
         'second_pos: for j in 0..result.len() {
             let mut current_guess = result;
@@ -49,6 +52,9 @@ pub fn solve(mm: &mut Mastermind) -> Values {
                 continue 'second_pos;
             }
             current_guess.swap(i, j);
+            if !tried_patterns.insert(current_guess) {
+                continue 'second_pos;
+            }
             match mm.guess(current_guess) {
                 GuessStatus::Success => return current_guess,
                 GuessStatus::Incorrect(e) => {
