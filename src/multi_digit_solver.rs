@@ -45,6 +45,9 @@ pub fn solve(mm: &mut Mastermind) -> Values {
     for i in 0..result.len() {
         'second_pos: for j in 0..result.len() {
             let mut current_guess = result;
+            if current_guess[i] == current_guess[j] {
+                continue 'second_pos;
+            }
             current_guess.swap(i, j);
             match mm.guess(current_guess) {
                 GuessStatus::Success => return current_guess,
