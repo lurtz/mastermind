@@ -79,23 +79,25 @@ mod test {
             #[test]
             fn $name() {
                 let values = $value;
-                for solver in $solvers.iter() {
+                for name_solver in $solvers.iter() {
+                    let (solver_name, solver) = name_solver;
                     let mut mm = Mastermind::new_with_state(values);
                     let solution = solver(&mut mm);
                     check_solution(&values, &mm, &solution);
+                    println!("{} solved in {} steps", solver_name, mm.get_guesses().len());
                 }
             }
         )*
     }}
 
     solver_tests! {
-        [multi_digit_solver::solve, single_digit_solver::solve];
-        solve_with_red_state_solves_the_game_fast: [Colors::Red; 4],
-        solve_with_green_state_solves_the_game_fast: [Colors::Green; 4],
-        solve_with_white_state_solves_the_game_fast: [Colors::White; 4],
-        solve_with_yellow_state_solves_the_game_fast: [Colors::Yellow; 4],
-        solve_with_blue_state_solves_the_game_fast: [Colors::Blue; 4],
-        solve_with_black_state_solves_the_game_slow: [Colors::Black; 4],
+        [("multi_digit_solver", multi_digit_solver::solve as SolverFn), ("single_digit_solver", single_digit_solver::solve as SolverFn)];
+        solve_with_red_state_solves_the_game: [Colors::Red; 4],
+        solve_with_green_state_solves_the_game: [Colors::Green; 4],
+        solve_with_white_state_solves_the_game: [Colors::White; 4],
+        solve_with_yellow_state_solves_the_game: [Colors::Yellow; 4],
+        solve_with_blue_state_solves_the_game: [Colors::Blue; 4],
+        solve_with_black_state_solves_the_game: [Colors::Black; 4],
         solve_with_mixed_state_solves_the_game0: [Colors::Blue, Colors::White, Colors::Green, Colors::Yellow],
         solve_with_mixed_state_solves_the_game1: [Colors::Red, Colors::White, Colors::Black, Colors::Yellow],
         solve_with_mixed_state_solves_the_game2: [Colors::Red, Colors::Red, Colors::Black, Colors::Black],
