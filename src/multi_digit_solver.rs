@@ -59,13 +59,23 @@ impl PossibleColors {
         let mut pc = PossibleColors::new(values);
         pc.reduce_colors(values, eval);
         pc
-
     }
 
     fn reduce_colors(&mut self, values: &Values, eval: &Evaluation) {
         if 0 == eval.get_correct_match() {
             for i in 0..values.len() {
                 self.colors[i].remove(&values[i]);
+            }
+        }
+    }
+
+    fn reduce_colors_with_previous_state(&mut self, values: &Values, eval: &Evaluation, old_values: &Values, old_eval: &Evaluation) {
+        self.reduce_colors(values, eval);
+        if eval.get_correct_match() < old_eval.get_correct_match() {
+            for i in 0..values.len() {
+                if values[i] != old_values[i] {
+                    self.colors[i].remove(&values[i]);
+                }
             }
         }
     }
@@ -77,9 +87,6 @@ impl PossibleColors {
         }
         result
     }
-
-    // TODO also check if result compared to previous attempt got worse -> switched colors can be
-    // removed from set
 }
 
 pub fn solve(mm: &mut Mastermind) -> Values {
@@ -114,7 +121,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
             match mm.guess(current_guess) {
                 GuessStatus::Success => return current_guess,
                 GuessStatus::Incorrect(e) => {
-                    possible_colors.reduce_colors(&current_guess, &e);
+                    possible_colors.reduce_colors_with_previous_state(&current_guess, &e, &result, &eval);
                     if eval.get_correct_match() < e.get_correct_match() {
                         result = current_guess;
                         eval = e;
