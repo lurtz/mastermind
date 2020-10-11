@@ -1,4 +1,5 @@
 use crate::colors::Colors;
+use crate::evaluation::Evaluation;
 use crate::mastermind::{GuessStatus, Mastermind};
 use crate::mastermind_state::{Values, NUM_ELEMENTS};
 use std::collections::HashSet;
@@ -37,6 +38,50 @@ fn are_all_colors_equal(values: &Values) -> bool {
     values.iter().all(|x| *x == first)
 }
 
+struct PossibleColors {
+    colors: [HashSet<Colors>; NUM_ELEMENTS],
+}
+
+impl PossibleColors {
+    fn new(values: &Values) -> PossibleColors {
+        let mut colors = HashSet::<Colors>::new();
+        for v in values {
+            colors.insert(*v);
+        }
+        let mut result: [HashSet<Colors>; NUM_ELEMENTS] = Default::default();
+        for r in result.iter_mut() {
+            *r = colors.clone();
+        }
+        PossibleColors{colors: result}
+    }
+
+    fn new_with_eval(values: &Values, eval: &Evaluation) -> PossibleColors {
+        let mut pc = PossibleColors::new(values);
+        pc.reduce_colors(values, eval);
+        pc
+
+    }
+
+    fn reduce_colors(&mut self, values: &Values, eval: &Evaluation) {
+        if 0 == eval.get_correct_match() {
+            for i in 0..values.len() {
+                self.colors[i].remove(&values[i]);
+            }
+        }
+    }
+
+    fn are_colors_ok(&self, values: &Values) -> bool {
+        let mut result = true;
+        for i in 0..values.len() {
+            result &= self.colors[i].contains(&values[i]);
+        }
+        result
+    }
+
+    // TODO also check if result compared to previous attempt got worse -> switched colors can be
+    // removed from set
+}
+
 pub fn solve(mm: &mut Mastermind) -> Values {
     let mut result = solve_colors(mm);
     if are_all_colors_equal(&result) {
@@ -49,6 +94,10 @@ pub fn solve(mm: &mut Mastermind) -> Values {
     }
     let mut tried_patterns = HashSet::new();
     tried_patterns.insert(result);
+    let mut possible_colors = PossibleColors::new_with_eval(&result, &eval);
+    if !possible_colors.are_colors_ok(&result) {
+        result.rotate_right(1);
+    }
     for i in 0..result.len() {
         'second_pos: for j in 0..result.len() {
             let mut current_guess = result;
@@ -59,9 +108,13 @@ pub fn solve(mm: &mut Mastermind) -> Values {
             if !tried_patterns.insert(current_guess) {
                 continue 'second_pos;
             }
+            if !possible_colors.are_colors_ok(&current_guess) {
+                continue 'second_pos;
+            }
             match mm.guess(current_guess) {
                 GuessStatus::Success => return current_guess,
                 GuessStatus::Incorrect(e) => {
+                    possible_colors.reduce_colors(&current_guess, &e);
                     if eval.get_correct_match() < e.get_correct_match() {
                         result = current_guess;
                         eval = e;
