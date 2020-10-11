@@ -5,7 +5,7 @@ use std::collections::HashSet;
 
 fn solve_colors(mm: &mut Mastermind) -> Values {
     let mut colors: Values = [Colors::Blue; NUM_ELEMENTS];
-    let mut colors_iter = colors.iter_mut();
+    let mut colors_iter = colors.iter_mut().peekable();
 
     for c in Colors::iter().take_while(|x| **x != Colors::last()) {
         let guess: Values = [*c; NUM_ELEMENTS];
@@ -17,6 +17,10 @@ fn solve_colors(mm: &mut Mastermind) -> Values {
             GuessStatus::Incorrect(s) => {
                 for _ in 0..(s.get_correct_match() + s.get_color_present()) {
                     *colors_iter.next().unwrap() = *c;
+                }
+                // quit early if all colors have been found
+                if colors_iter.peek().is_none() {
+                    return colors;
                 }
             }
         }
