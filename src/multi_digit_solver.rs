@@ -27,7 +27,7 @@ fn solve_colors(mm: &mut Mastermind) -> Values {
     colors
 }
 
-fn are_all_colors_equal(values: Values) -> bool {
+fn are_all_colors_equal(values: &Values) -> bool {
     assert!(!values.is_empty());
     let first = values[0];
     values.iter().all(|x| *x == first)
@@ -35,7 +35,7 @@ fn are_all_colors_equal(values: Values) -> bool {
 
 pub fn solve(mm: &mut Mastermind) -> Values {
     let mut result = solve_colors(mm);
-    if are_all_colors_equal(result) {
+    if are_all_colors_equal(&result) {
         return result;
     }
     let mut eval;
