@@ -91,7 +91,7 @@ mod test {
     }}
 
     solver_tests! {
-        [("multi_digit_solver", multi_digit_solver::solve as SolverFn), ("single_digit_solver", single_digit_solver::solve as SolverFn)];
+        [("single_digit_solver", single_digit_solver::solve as SolverFn), ("multi_digit_solver", multi_digit_solver::solve as SolverFn)];
         solve_with_red_state_solves_the_game: [Colors::Red; 4],
         solve_with_green_state_solves_the_game: [Colors::Green; 4],
         solve_with_white_state_solves_the_game: [Colors::White; 4],
@@ -104,5 +104,9 @@ mod test {
         solve_with_mixed_state_solves_the_game3: [Colors::Red, Colors::Black, Colors::Black, Colors::Red],
         solve_with_mixed_state_solves_the_game4: [Colors::White, Colors::Blue, Colors::Blue, Colors::White],
         solve_with_mixed_state_solves_the_game5: [Colors::Green, Colors::Yellow, Colors::Green, Colors::Yellow],
+        solve_with_mixed_state_solves_the_game6: [Colors::Black, Colors::White, Colors::Yellow, Colors::Blue],
+        solve_with_mixed_state_solves_the_game7: [Colors::White, Colors::Yellow, Colors::Blue, Colors::Black],
+        solve_with_mixed_state_solves_the_game8: [Colors::White, Colors::Blue, Colors::Yellow, Colors::Black],
+        solve_with_mixed_state_solves_the_game9: [Colors::Black, Colors::Blue, Colors::Yellow, Colors::White],
     }
 }

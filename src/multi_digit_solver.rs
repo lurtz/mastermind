@@ -55,12 +55,6 @@ impl PossibleColors {
         PossibleColors{colors: result}
     }
 
-    fn new_with_eval(values: &Values, eval: &Evaluation) -> PossibleColors {
-        let mut pc = PossibleColors::new(values);
-        pc.reduce_colors(values, eval);
-        pc
-    }
-
     fn reduce_colors(&mut self, values: &Values, eval: &Evaluation) {
         if 0 == eval.get_correct_match() {
             for i in 0..values.len() {
@@ -69,12 +63,38 @@ impl PossibleColors {
         }
     }
 
+    fn sort<'a>(values: &'a Values, eval: &'a Evaluation, old_values: &'a Values, old_eval: &'a Evaluation) -> (&'a Values, &'a Evaluation, &'a Values, &'a Evaluation) {
+        if eval.get_correct_match() < old_eval.get_correct_match() {
+            (old_values, old_eval, values, eval)
+        } else {
+            (values, eval, old_values, old_eval)
+        }
+    }
+
     fn reduce_colors_with_previous_state(&mut self, values: &Values, eval: &Evaluation, old_values: &Values, old_eval: &Evaluation) {
         self.reduce_colors(values, eval);
-        if eval.get_correct_match() < old_eval.get_correct_match() {
+        // TODO reduce colors for two slots if matches went down by 2
+        let (&better_values, &better_eval, &worse_values, &worse_eval) = PossibleColors::sort(values, eval, old_values, old_eval);
+        if worse_eval.get_correct_match() + 2 == better_eval.get_correct_match() {
             for i in 0..values.len() {
-                if values[i] != old_values[i] {
-                    self.colors[i].remove(&values[i]);
+                if worse_values[i] != better_values[i] {
+                    self.colors[i].clear();
+                    self.colors[i].insert(better_values[i]);
+                }
+            }
+        }
+        if worse_eval.get_correct_match() + 1 == better_eval.get_correct_match() {
+            for i in 0..values.len() {
+                if worse_values[i] != better_values[i] {
+                    self.colors[i].remove(&worse_values[i]);
+                }
+            }
+        }
+        else if (better_eval.get_correct_match() == worse_eval.get_correct_match()) && 4 == self.get_num_colors() {
+            for i in 0..values.len() {
+                if better_values[i] != worse_values[i] {
+                    self.colors[i].remove(&better_values[i]);
+                    self.colors[i].remove(&worse_values[i]);
                 }
             }
         }
@@ -87,6 +107,16 @@ impl PossibleColors {
         }
         result
     }
+
+    fn get_num_colors(&self) -> usize {
+        let mut used_colors = HashSet::<Colors>::new();
+        for colors in self.colors.iter() {
+            for c in colors {
+                used_colors.insert(*c);
+            }
+        }
+        used_colors.len()
+    }
 }
 
 pub fn solve(mm: &mut Mastermind) -> Values {
@@ -94,17 +124,26 @@ pub fn solve(mm: &mut Mastermind) -> Values {
     if are_all_colors_equal(&result) {
         return result;
     }
-    let mut eval;
-    match mm.guess(result) {
-        GuessStatus::Success => return result,
-        GuessStatus::Incorrect(e) => eval = e,
-    }
+    let mut eval = Evaluation::new(0,0);
     let mut tried_patterns = HashSet::new();
-    tried_patterns.insert(result);
-    let mut possible_colors = PossibleColors::new_with_eval(&result, &eval);
-    if !possible_colors.are_colors_ok(&result) {
-        result.rotate_right(1);
+    let mut possible_colors = PossibleColors::new(&result);
+    let mut shift_loop = true;
+    while shift_loop {
+        match mm.guess(result) {
+            GuessStatus::Success => return result,
+            GuessStatus::Incorrect(e) => {
+                eval = e;
+                possible_colors.reduce_colors(&result, &eval);
+                tried_patterns.insert(result);
+                if !possible_colors.are_colors_ok(&result) {
+                    result.rotate_right(1);
+                } else {
+                    shift_loop = false;
+                }
+            },
+        }
     }
+
     for i in 0..result.len() {
         'second_pos: for j in 0..result.len() {
             let mut current_guess = result;
