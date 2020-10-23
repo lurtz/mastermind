@@ -39,8 +39,8 @@ mod test {
     use crate::manual_solver::solve_with_input;
     use crate::mastermind::Mastermind;
     use crate::mastermind_state::{get_guess_from_string, Values};
-    use crate::solver::SolverFn;
     use crate::solver::test_utils::check_solution;
+    use crate::solver::SolverFn;
     use std::io::{Error, ErrorKind};
 
     #[test]
@@ -50,9 +50,8 @@ mod test {
 
     #[test]
     fn solve_with_correct_guess() {
-        let return_black = || -> Result<Values, Error> {
-            Ok(get_guess_from_string(String::from("5555")))
-        };
+        let return_black =
+            || -> Result<Values, Error> { Ok(get_guess_from_string(String::from("5555"))) };
         let values = [Colors::Black; 4];
         let mut mm = Mastermind::new_with_state(values);
         let solution = solve_with_input(&mut mm, return_black);
@@ -82,12 +81,9 @@ mod test {
     #[test]
     #[should_panic]
     fn solve_with_erroring_input_panics() {
-        let return_black = || -> Result<Values, Error> {
-            Err(Error::from(ErrorKind::InvalidData))
-        };
+        let return_black = || -> Result<Values, Error> { Err(Error::from(ErrorKind::InvalidData)) };
         let values = [Colors::Black; 4];
         let mut mm = Mastermind::new_with_state(values);
         let _ = solve_with_input(&mut mm, return_black);
     }
-
 }

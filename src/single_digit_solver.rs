@@ -36,9 +36,9 @@ pub fn solve(mm: &mut Mastermind) -> Values {
 #[cfg(test)]
 mod test {
     use crate::single_digit_solver::solve;
+    use crate::solver::test_utils::check_solution;
     use crate::solver::SolverFn;
     use crate::Mastermind;
-    use crate::solver::test_utils::check_solution;
 
     #[test]
     fn solve_has_correct_type() {

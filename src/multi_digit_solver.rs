@@ -52,7 +52,7 @@ impl PossibleColors {
         for r in result.iter_mut() {
             *r = colors.clone();
         }
-        PossibleColors{colors: result}
+        PossibleColors { colors: result }
     }
 
     fn reduce_colors(&mut self, values: &Values, eval: &Evaluation) {
@@ -63,7 +63,12 @@ impl PossibleColors {
         }
     }
 
-    fn sort<'a>(values: &'a Values, eval: &'a Evaluation, old_values: &'a Values, old_eval: &'a Evaluation) -> (&'a Values, &'a Evaluation, &'a Values, &'a Evaluation) {
+    fn sort<'a>(
+        values: &'a Values,
+        eval: &'a Evaluation,
+        old_values: &'a Values,
+        old_eval: &'a Evaluation,
+    ) -> (&'a Values, &'a Evaluation, &'a Values, &'a Evaluation) {
         if eval.get_correct_match() < old_eval.get_correct_match() {
             (old_values, old_eval, values, eval)
         } else {
@@ -89,8 +94,9 @@ impl PossibleColors {
                     self.colors[i].remove(&worse_values[i]);
                 }
             }
-        }
-        else if (better_eval.get_correct_match() == worse_eval.get_correct_match()) && 4 == self.get_num_colors() {
+        } else if (better_eval.get_correct_match() == worse_eval.get_correct_match())
+            && 4 == self.get_num_colors()
+        {
             for i in 0..values.len() {
                 if better_values[i] != worse_values[i] {
                     self.colors[i].remove(&better_values[i]);
@@ -124,7 +130,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
     if are_all_colors_equal(&result) {
         return result;
     }
-    let mut eval = Evaluation::new(0,0);
+    let mut eval = Evaluation::new(0, 0);
     let mut tried_patterns = HashSet::new();
     let mut possible_colors = PossibleColors::new(&result);
     let mut shift_loop = true;
@@ -140,7 +146,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
                 } else {
                     shift_loop = false;
                 }
-            },
+            }
         }
     }
 
@@ -160,7 +166,12 @@ pub fn solve(mm: &mut Mastermind) -> Values {
             match mm.guess(current_guess) {
                 GuessStatus::Success => return current_guess,
                 GuessStatus::Incorrect(e) => {
-                    possible_colors.reduce_colors_with_previous_state(&current_guess, &e, &result, &eval);
+                    possible_colors.reduce_colors_with_previous_state(
+                        &current_guess,
+                        &e,
+                        &result,
+                        &eval,
+                    );
                     if eval.get_correct_match() < e.get_correct_match() {
                         result = current_guess;
                         eval = e;
@@ -176,9 +187,9 @@ pub fn solve(mm: &mut Mastermind) -> Values {
 #[cfg(test)]
 mod test {
     use crate::multi_digit_solver::solve;
+    use crate::solver::test_utils::check_solution;
     use crate::solver::SolverFn;
     use crate::Mastermind;
-    use crate::solver::test_utils::check_solution;
 
     #[test]
     fn solve_has_correct_type() {

@@ -20,7 +20,6 @@ pub fn parse_args(args: Vec<String>) -> SolverFn {
     solver
 }
 
-
 #[cfg(test)]
 pub mod test_utils {
     use crate::mastermind::Mastermind;
@@ -37,10 +36,10 @@ pub mod test_utils {
 mod test {
     use crate::colors::Colors;
     use crate::mastermind::Mastermind;
-    use crate::{multi_digit_solver, single_digit_solver, manual_solver};
-    use crate::solver::{parse_args, SolverFn};
-    use std::string::String;
     use crate::solver::test_utils::check_solution;
+    use crate::solver::{parse_args, SolverFn};
+    use crate::{manual_solver, multi_digit_solver, single_digit_solver};
+    use std::string::String;
 
     #[test]
     fn empty_args_results_in_manual_solver() {
@@ -58,20 +57,26 @@ mod test {
 
     #[test]
     fn single_results_in_single_digit_solver() {
-        parse_args_tests(vec![String::from("bla"), String::from("single")],
-                single_digit_solver::solve);
+        parse_args_tests(
+            vec![String::from("bla"), String::from("single")],
+            single_digit_solver::solve,
+        );
     }
 
     #[test]
     fn multi_results_in_multi_digit_solver() {
-        parse_args_tests(vec![String::from("bla"), String::from("multi")],
-                multi_digit_solver::solve);
+        parse_args_tests(
+            vec![String::from("bla"), String::from("multi")],
+            multi_digit_solver::solve,
+        );
     }
 
     #[test]
     fn unknown_string_results_in_manual_solver() {
-        parse_args_tests(vec![String::from("bla"), String::from("fdjafda")],
-                manual_solver::solve);
+        parse_args_tests(
+            vec![String::from("bla"), String::from("fdjafda")],
+            manual_solver::solve,
+        );
     }
 
     macro_rules! solver_tests {($solvers:expr; $($name:ident: $value:expr,)*) => {
