@@ -38,8 +38,10 @@ fn are_all_colors_equal(values: &Values) -> bool {
     values.iter().all(|x| *x == first)
 }
 
+type PossibleColorsT = [HashSet<Colors>; NUM_ELEMENTS];
+
 struct PossibleColors {
-    colors: [HashSet<Colors>; NUM_ELEMENTS],
+    colors: PossibleColorsT,
 }
 
 impl PossibleColors {
@@ -76,32 +78,57 @@ impl PossibleColors {
         }
     }
 
-    fn reduce_colors_with_previous_state(&mut self, values: &Values, eval: &Evaluation, old_values: &Values, old_eval: &Evaluation) {
-        self.reduce_colors(values, eval);
-        // TODO reduce colors for two slots if matches went down by 2
-        let (&better_values, &better_eval, &worse_values, &worse_eval) = PossibleColors::sort(values, eval, old_values, old_eval);
-        if worse_eval.get_correct_match() + 2 == better_eval.get_correct_match() {
-            for i in 0..values.len() {
-                if worse_values[i] != better_values[i] {
-                    self.colors[i].clear();
-                    self.colors[i].insert(better_values[i]);
-                }
-            }
+    fn create_actions(diff: u8) -> Box<dyn Fn(&Colors, &Colors, &mut HashSet<Colors>)> {
+        if 2 == diff {
+            return Box::new(
+                |better: &Colors, _worse: &Colors, colors: &mut HashSet<Colors>| {
+                    colors.clear();
+                    colors.insert(*better);
+                },
+            );
         }
-        if worse_eval.get_correct_match() + 1 == better_eval.get_correct_match() {
-            for i in 0..values.len() {
-                if worse_values[i] != better_values[i] {
-                    self.colors[i].remove(&worse_values[i]);
-                }
-            }
-        } else if (better_eval.get_correct_match() == worse_eval.get_correct_match())
-            && 4 == self.get_num_colors()
-        {
-            for i in 0..values.len() {
-                if better_values[i] != worse_values[i] {
-                    self.colors[i].remove(&better_values[i]);
-                    self.colors[i].remove(&worse_values[i]);
-                }
+
+        if 1 == diff {
+            return Box::new(
+                |_better: &Colors, worse: &Colors, colors: &mut HashSet<Colors>| {
+                    colors.remove(worse);
+                },
+            );
+        }
+
+        if 0 == diff {
+            return Box::new(
+                |better: &Colors, worse: &Colors, colors: &mut HashSet<Colors>| {
+                    colors.remove(better);
+                    colors.remove(worse);
+                },
+            );
+        }
+
+        Box::new(|_better: &Colors, _worse: &Colors, _colors: &mut HashSet<Colors>| {})
+    }
+
+    fn reduce_colors_with_previous_state(
+        &mut self,
+        values: &Values,
+        eval: &Evaluation,
+        old_values: &Values,
+        old_eval: &Evaluation,
+    ) {
+        self.reduce_colors(values, eval);
+        let (&better_values, &better_eval, &worse_values, &worse_eval) =
+            PossibleColors::sort(values, eval, old_values, old_eval);
+        let diff = better_eval.get_correct_match() - worse_eval.get_correct_match();
+        if 0 == diff && 4 != self.get_num_colors() {
+            return;
+        }
+        // dangling pointer?!
+        let action = &PossibleColors::create_actions(diff);
+        for i in 0..values.len() {
+            let worse = &worse_values[i];
+            let better = &better_values[i];
+            if worse != better {
+                action(better, worse, &mut self.colors[i]);
             }
         }
     }
