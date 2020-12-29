@@ -177,38 +177,39 @@ pub fn solve(mm: &mut Mastermind) -> Values {
         }
     }
 
-    for i in 0..result.len() {
-        'second_pos: for j in 0..result.len() {
-            let mut current_guess = result;
-            if current_guess[i] == current_guess[j] {
-                continue 'second_pos;
-            }
-            current_guess.swap(i, j);
-            if !tried_patterns.insert(current_guess) {
-                continue 'second_pos;
-            }
-            if !possible_colors.are_colors_ok(&current_guess) {
-                continue 'second_pos;
-            }
-            match mm.guess(current_guess) {
-                GuessStatus::Success => return current_guess,
-                GuessStatus::Incorrect(e) => {
-                    possible_colors.reduce_colors_with_previous_state(
-                        &current_guess,
-                        &e,
-                        &result,
-                        &eval,
-                    );
-                    if eval.get_correct_match() < e.get_correct_match() {
-                        result = current_guess;
-                        eval = e;
-                        break 'second_pos;
+    loop {
+        for i in 0..result.len() {
+            'second_pos: for j in 0..result.len() {
+                let mut current_guess = result;
+                if current_guess[i] == current_guess[j] {
+                    continue 'second_pos;
+                }
+                current_guess.swap(i, j);
+                if !tried_patterns.insert(current_guess) {
+                    continue 'second_pos;
+                }
+                if !possible_colors.are_colors_ok(&current_guess) {
+                    continue 'second_pos;
+                }
+                match mm.guess(current_guess) {
+                    GuessStatus::Success => return current_guess,
+                    GuessStatus::Incorrect(e) => {
+                        possible_colors.reduce_colors_with_previous_state(
+                            &current_guess,
+                            &e,
+                            &result,
+                            &eval,
+                        );
+                        if eval.get_correct_match() < e.get_correct_match() {
+                            result = current_guess;
+                            eval = e;
+                            break 'second_pos;
+                        }
                     }
                 }
             }
         }
     }
-    result
 }
 
 #[cfg(test)]

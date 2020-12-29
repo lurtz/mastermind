@@ -113,5 +113,6 @@ mod test {
         solve_with_mixed_state_solves_the_game7: [Colors::White, Colors::Yellow, Colors::Blue, Colors::Black],
         solve_with_mixed_state_solves_the_game8: [Colors::White, Colors::Blue, Colors::Yellow, Colors::Black],
         solve_with_mixed_state_solves_the_game9: [Colors::Black, Colors::Blue, Colors::Yellow, Colors::White],
+        solve_with_test_fail: [Colors::White, Colors::Black, Colors::Green, Colors::Red],
     }
 }
