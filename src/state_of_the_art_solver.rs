@@ -23,6 +23,7 @@ impl AllStates {
     }
 
     fn reduce(&mut self, values: &Values, eval: &Evaluation) -> Values {
+        self.states.retain(|x| x != values);
         let state = MastermindState::new_initial(*values);
         let same_evaluation = |possible_state: &Values| -> bool {
             let diff = state.new_diff_state(*possible_state);
