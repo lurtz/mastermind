@@ -59,8 +59,8 @@ impl PossibleColors {
 
     fn reduce_colors(&mut self, values: &Values, eval: &Evaluation) {
         if 0 == eval.get_correct_match() {
-            for i in 0..values.len() {
-                self.colors[i].remove(&values[i]);
+            for (i, &value) in values.iter().enumerate() {
+                self.colors[i].remove(&value);
             }
         }
     }
@@ -135,8 +135,8 @@ impl PossibleColors {
 
     fn are_colors_ok(&self, values: &Values) -> bool {
         let mut result = true;
-        for i in 0..values.len() {
-            result &= self.colors[i].contains(&values[i]);
+        for (i, &item) in values.iter().enumerate() {
+            result &= self.colors[i].contains(&item);
         }
         result
     }

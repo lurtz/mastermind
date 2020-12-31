@@ -3,6 +3,7 @@ use crate::mastermind::Mastermind;
 use crate::mastermind_state::Values;
 use crate::multi_digit_solver;
 use crate::single_digit_solver;
+use crate::state_of_the_art_solver;
 
 pub type SolverFn = fn(&mut Mastermind) -> Values;
 
@@ -14,6 +15,8 @@ pub fn parse_args(args: Vec<String>) -> SolverFn {
         solver = single_digit_solver::solve;
     } else if "multi" == args[1] {
         solver = multi_digit_solver::solve;
+    } else if "state" == args[1] {
+        solver = state_of_the_art_solver::solve;
     } else {
         solver = manual_solver::solve;
     }
@@ -68,6 +71,14 @@ mod test {
         parse_args_tests(
             vec![String::from("bla"), String::from("multi")],
             multi_digit_solver::solve,
+        );
+    }
+
+    #[test]
+    fn state_results_in_state_of_the_art_solver() {
+        parse_args_tests(
+            vec![String::from("bla"), String::from("state")],
+            state_of_the_art_solver::solve,
         );
     }
 

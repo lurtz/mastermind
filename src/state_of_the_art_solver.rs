@@ -27,8 +27,8 @@ impl AllStates {
         let same_evaluation = |possible_state: &Values| -> bool {
             let diff = state.new_diff_state(*possible_state);
             let tmp_eval = diff.get_evaluation();
-            return tmp_eval.get_correct_match() == eval.get_correct_match()
-                && tmp_eval.get_color_present() == eval.get_color_present();
+            tmp_eval.get_correct_match() == eval.get_correct_match()
+                && tmp_eval.get_color_present() == eval.get_color_present()
         };
         self.states.retain(same_evaluation);
         self.new_pick()
