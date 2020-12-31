@@ -6,6 +6,7 @@ mod mastermind_state;
 mod multi_digit_solver;
 mod single_digit_solver;
 mod solver;
+mod state_of_the_art_solver;
 mod util;
 
 use mastermind::Mastermind;

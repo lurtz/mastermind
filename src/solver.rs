@@ -38,7 +38,7 @@ mod test {
     use crate::mastermind::Mastermind;
     use crate::solver::test_utils::check_solution;
     use crate::solver::{parse_args, SolverFn};
-    use crate::{manual_solver, multi_digit_solver, single_digit_solver};
+    use crate::{manual_solver, multi_digit_solver, single_digit_solver, state_of_the_art_solver};
     use std::string::String;
 
     #[test]
@@ -96,7 +96,10 @@ mod test {
     }}
 
     solver_tests! {
-        [("single_digit_solver", single_digit_solver::solve as SolverFn), ("multi_digit_solver", multi_digit_solver::solve as SolverFn)];
+        [
+            ("single_digit_solver", single_digit_solver::solve as SolverFn),
+            ("multi_digit_solver", multi_digit_solver::solve as SolverFn),
+            ("state_of_the_art_solver", state_of_the_art_solver::solve as SolverFn)];
         solve_with_red_state_solves_the_game: [Colors::Red; 4],
         solve_with_green_state_solves_the_game: [Colors::Green; 4],
         solve_with_white_state_solves_the_game: [Colors::White; 4],
