@@ -23,14 +23,8 @@ impl AllStates {
     }
 
     fn reduce(&mut self, values: &Values, eval: &Evaluation) -> Values {
-        self.states.retain(|x| x != values);
         let state = MastermindState::new_initial(*values);
-        let same_evaluation = |possible_state: &Values| -> bool {
-            let tmp_eval = state.diff(possible_state);
-            tmp_eval.get_correct_match() == eval.get_correct_match()
-                && tmp_eval.get_color_present() == eval.get_color_present()
-        };
-        self.states.retain(same_evaluation);
+        self.states.retain(|possible_state| state.diff(possible_state) == *eval);
         self.new_pick()
     }
 
