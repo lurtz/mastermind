@@ -111,7 +111,7 @@ mod test {
             state = MastermindState::new_random_state();
         }
         let status = mm.guess(state.get_values());
-        let diff = mm.get_initial().new_diff_state(state.get_values());
-        assert_eq!(GuessStatus::Incorrect(diff.get_evaluation()), status);
+        let eval = mm.get_initial().diff(&state.get_values());
+        assert_eq!(GuessStatus::Incorrect(eval), status);
     }
 }

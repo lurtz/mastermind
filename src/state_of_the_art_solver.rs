@@ -26,8 +26,7 @@ impl AllStates {
         self.states.retain(|x| x != values);
         let state = MastermindState::new_initial(*values);
         let same_evaluation = |possible_state: &Values| -> bool {
-            let diff = state.new_diff_state(*possible_state);
-            let tmp_eval = diff.get_evaluation();
+            let tmp_eval = state.diff(possible_state);
             tmp_eval.get_correct_match() == eval.get_correct_match()
                 && tmp_eval.get_color_present() == eval.get_color_present()
         };
