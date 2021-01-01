@@ -24,7 +24,8 @@ impl AllStates {
 
     fn reduce(&mut self, values: &Values, eval: &Evaluation) -> Values {
         let state = MastermindState::new_initial(*values);
-        self.states.retain(|possible_state| state.diff(possible_state) == *eval);
+        self.states
+            .retain(|possible_state| state.diff(possible_state) == *eval);
         self.new_pick()
     }
 
@@ -44,9 +45,9 @@ pub fn solve(mm: &mut Mastermind) -> Values {
 
 #[cfg(test)]
 mod test {
-    use crate::state_of_the_art_solver::solve;
     use crate::solver::test_utils::check_solution;
     use crate::solver::SolverFn;
+    use crate::state_of_the_art_solver::solve;
     use crate::Mastermind;
 
     #[test]
