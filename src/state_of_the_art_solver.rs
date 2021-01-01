@@ -51,7 +51,7 @@ pub fn solve(mm: &mut Mastermind) -> Values {
 
 #[cfg(test)]
 mod test {
-    use crate::multi_digit_solver::solve;
+    use crate::state_of_the_art_solver::solve;
     use crate::solver::test_utils::check_solution;
     use crate::solver::SolverFn;
     use crate::Mastermind;
